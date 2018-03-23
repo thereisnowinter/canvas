@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="//at.alicdn.com/t/font_582529_xy94tfvo98cfecdi.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul,
+        li {
+            list-style: none;
+        }
+
+        .icon {
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.15e  m;
+            fill: currentColor;
+            overflow: hidden;
+        }
+
+        body {
+            overflow: hidden;
+            /* margin: 0;
+            视口的位置就相当于 canvas的位置 */
+         }
+
+        #practice {
+            display: block;
+            background-color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .actions {
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+        }
+
+        .actions svg {
+            width: 1.5em;
+            height: 1.5em;
+            transition: all 0.3s;
+            margin: 0 10px;
+        }
+
+        .actions svg.active {
+            fill: red;
+            transform: scale(1.2);
+
+        }
+
+        .colors {
+            position: fixed;
+            top: 40px;
+            left: 28px;
+
+        }
+
+        .colors>li {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.25);
+            margin: 10px 0;
+            transition: all 0.3s;
+
+
+        }
+
+        .colors>li.red {
+            background-color: red;
+        }
+
+        .colors>li.blue {
+            background-color: blue;
+        }
+
+        .colors>li.green {
+            background-color: green;
+        }
+        .colors>li.black {
+            background-color: black;
+        }
+        .colors li.active {
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.95);
+            transform: scale(1.2)
+        }
+
+        .sizes {
+            position: fixed;
+            right: 20px;
+            top: 10px;
+        }
+
+        .sizes>li {
+            margin: 20px 0;
+        }
+
+        .sizes>.thin {
+            height: 0;
+            width: 20px;
+            border-top: 3px solid black;
+        }
+
+        .sizes>.thick {
+            height: 0;
+            width: 20px;
+            border-top: 10px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id='practice'></canvas>
+    <div id="actions" class="actions">
+        <svg id="pen" class=" active icon" aria-hidden="true">
+            <use xlink:href="#icon-pen"></use>
+        </svg>
+        <svg id="eraser" class="icon" aria-hidden="true">
+            <use xlink:href="#icon-eraser"></use>
+        </svg>
+        <svg id="clear" class="icon" aria-hidden="true">
+            <use xlink:href="#icon-clear"></use>
+        </svg>
+        <svg id="download" class="icon" aria-hidden="true">
+            <use xlink:href="#icon-download"></use>
+        </svg>
+        <ol class="colors">
+            <li id="red" class="red active"></li>
+            <li id="green" class="green active"></li>
+            <li id="blue" class="blue active"></li>
+            <li id="black" class="black active"></li>
+        </ol>
+        <ol class="sizes">
+            <li id="thin" class="thin"></li>
+            <li id="thick" class="thick"></li>
+        </ol>
+</body>
+<script>
+    //  获取 屏幕的 宽高
+    var canvasA = document.getElementById('practice')
+
+    var context = canvasA.getContext('2d')// 2次元上下文
+    var lineWidth = 5
+    getPage(canvasA)
+    listenToUser(canvasA)
+    // 移动窗口也没有关系
+
+
+    // context.strokeStyle = 'yellow'
+    // context.strokRect(10,10,100,100)
+    // context.fillStyle = 'red'// 颜色变红
+    // context.fillRect(10, 10, 100, 100) // 大概的形状 strokeRect  描边
+    // context.clearRect(50,50,10,10) // 橡皮擦
+
+    // 橡皮擦的技巧
+    var eraserEnabled = false
+    pen.onclick = function () {
+        eraserEnabled = false
+        pen.classList.add('active')
+        eraser.classList.remove('active')
+    }
+    eraser.onclick = function () {
+        eraserEnabled = true
+        eraser.classList.add('active')
+        pen.classList.remove('active')
+    }
+    blue.onclick = function () {
+        context.strokeStyle = "blue"
+        blue.classList.add('active')
+        green.classList.remove('active')
+        red.classList.remove('active')
+        black.classList.remove('active')
+    }
+    red.onclick = function () {
+        context.strokeStyle = "red"
+        red.classList.add('active')
+        green.classList.remove('active')
+        blue.classList.remove('active')
+        black.classList.remove('active')
+    }
+    green.onclick = function () {
+        context.strokeStyle = "green"
+        green.classList.add('active')
+        red.classList.remove('active')
+        blue.classList.remove('active')
+        black.classList.remove('active')
+    }
+    black.onclick = function () {
+        context.strokeStyle = "black"
+        black.classList.add('active')
+        red.classList.remove('active')
+        blue.classList.remove('active')
+        green.classList.remove('active')
+    }
+    clear.onclick = function () {
+        context.clearRect(0, 0, canvasA.width, canvasA.height)
+    }
+    thin.onclick = function () {
+        lineWidth = 5
+    }
+    thick.onclick = function () {
+        lineWidth = 10
+    }
+    download.onclick = function () {
+        let url = canvasA.toDataURL("img/png")
+        let a = document.createElement('a')
+        document.body.appendChild(a)
+        a.href = url
+        a.download = "画画"
+        a.target = "_blank"
+        a.click()
+    }
+    function setPage() {
+        var pageWidth = document.documentElement.clientWidth
+        var pageHeight = document.documentElement.clientHeight
+        canvasA.width = pageWidth
+        canvasA.height = pageHeight
+    }
+    //  function drawCircle(x, y, radius) {
+    //     context.beginPath()
+    //     context.fillStyle = 'black'
+    //     context.arc(x, y, radius, 0, Math.PI * 2)
+    //     context.fill()
+    // }
+    function getPage(canvasA) {
+        setPage()
+        window.onresize = function () {
+            setPage()
+        }
+    }
+    function listenToUser(canvasA) {
+        var using = false
+        var lastPoint = { x: undefined, y: undefined }
+        // 特性检测
+        if (document.body.ontouchstart !== undefined) {
+            //触屏模式
+            canvasA.ontouchstart = function (aaa) {
+                let x = aaa.touches[0].clientX
+                let y = aaa.touches[0].clientY
+                using = true // 画画模式被开启      
+                // 用橡皮擦 
+                if (eraserEnabled) {
+                    context.clearRect(x - 5, y - 5, 10, 10)  // 擦东西
+                } else {
+                    lastPoint = { x: x, y: y } // 点的位置被记住
+                    // console.log(lastPoint)
+                    // drawCircle(x, y, 1) //相对视口
+                }
+            }
+            canvasA.ontouchmove = function (aaa) {
+                let x = aaa.touches[0].clientX
+                let y = aaa.touches[0].clientY
+                if (!using) { return }
+                if (eraserEnabled) {
+                    context.clearRect(x - 5, y - 5, 10, 10) // 擦东西
+                }
+                else {
+                    let newPonit = { x: x, y: y }
+                    // drawCircle(x, y, 1)
+                    drawLine(lastPoint.x, lastPoint.y, newPonit.x, newPonit.y)
+                    lastPoint = newPonit   // 实时更新 上一个点
+                }
+            }
+            canvasA.ontouchend = function (aaa) {
+                using = false
+            }
+
+        } else {  // 非触屏模式
+            canvasA.onmousedown = function (aaa) {
+                let x = aaa.clientX
+                let y = aaa.clientY
+                using = true // 画画模式被开启
+                // 用橡皮擦 
+                if (eraserEnabled) {
+                    context.clearRect(x - 5, y - 5, 10, 10)  // 擦东西
+                } else {
+                    lastPoint = { x: x, y: y } // 点的位置被记住
+                    // console.log(lastPoint)
+                    // drawCircle(x, y, 1) //相对视口
+                }
+            }
+
+            canvasA.onmousemove = function (aaa) {
+                let x = aaa.clientX
+                let y = aaa.clientY
+                if (!using) { return }
+                if (eraserEnabled) {
+                    context.clearRect(x - 5, y - 5, 10, 10) // 擦东西
+                }
+                else {
+                    let newPonit = { x: x, y: y }
+                    // drawCircle(x, y, 1)
+                    drawLine(lastPoint.x, lastPoint.y, newPonit.x, newPonit.y)
+                    lastPoint = newPonit   // 实时更新 上一个点
+                }
+            }
+
+            canvasA.onmouseup = function (aaa) {
+                using = false  // 画画模式已经结束
+            }
+        }
+    }
+
+
+
+    function drawLine(x1, y1, x2, y2) {
+        context.beginPath()
+        context.moveTo(x1, y1) //起点
+        context.lineWidth = lineWidth  // 线的宽度
+        context.lineTo(x2, y2) // 终点
+        context.stroke()
+        context.closePath()
+    }
+
+</script>
+<script src="//at.alicdn.com/t/font_582529_t7hfx792c07ldi.js"></script>
+
+</html>
